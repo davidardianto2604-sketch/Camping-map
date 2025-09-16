@@ -1,142 +1,173 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Checklist Perlengkapan Camping</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f9fafb;
-      margin: 0;
-      padding: 20px;
-    }
-    h1 {
-      text-align: center;
-      color: #2c3e50;
-    }
-    .progress-container {
-      width: 100%;
-      background: #e0e0e0;
-      border-radius: 20px;
-      margin: 20px 0;
-      height: 25px;
-    }
-    .progress-bar {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, #4caf50, #81c784);
-      border-radius: 20px;
-      text-align: center;
-      color: white;
-      font-size: 14px;
-      line-height: 25px;
-    }
-    .category {
-      background: white;
-      padding: 15px;
-      border-radius: 10px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-    .category h2 {
-      font-size: 18px;
-      margin-bottom: 10px;
-      color: #34495e;
-    }
-    label {
-      display: block;
-      margin: 6px 0;
-      cursor: pointer;
-    }
-    input[type="checkbox"] {
-      margin-right: 10px;
-    }
-    button {
-      display: block;
-      margin: 20px auto;
-      padding: 10px 20px;
-      font-size: 16px;
-      background: #e74c3c;
-      border: none;
-      border-radius: 8px;
-      color: white;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #c0392b;
-    }
-  </style>
-</head>
-<body>
-  <h1>Checklist Camping</h1>
-
-  <!-- Progress Bar -->
-  <div class="progress-container">
-    <div class="progress-bar" id="progressBar">0%</div>
-  </div>
-
-  <!-- Kategori: Peralatan Utama -->
-  <div class="category">
-    <h2>Peralatan Utama</h2>
-    <label><input type="checkbox"> Tas Carrier</label>
-    <label><input type="checkbox"> Tenda</label>
-    <label><input type="checkbox"> Matras</label>
-    <label><input type="checkbox"> Sleeping Bag</label>
-  </div>
-
-  <!-- Kategori: Pakaian -->
-  <div class="category">
-    <h2>Pakaian</h2>
-    <label><input type="checkbox"> Jaket</label>
-    <label><input type="checkbox"> Jas Hujan</label>
-    <label><input type="checkbox"> Sepatu</label>
-    <label><input type="checkbox"> Pakaian Ganti</label>
-  </div>
-
-  <!-- Kategori: Penerangan -->
-  <div class="category">
-    <h2>Penerangan</h2>
-    <label><input type="checkbox"> Senter</label>
-    <label><input type="checkbox"> Headlamp</label>
-  </div>
-
-  <!-- Kategori: Peralatan Masak -->
-  <div class="category">
-    <h2>Peralatan Masak</h2>
-    <label><input type="checkbox"> Kompor</label>
-    <label><input type="checkbox"> Peralatan Masak (panci, wajan, sendok, dll)</label>
-    <label><input type="checkbox"> Makanan & Minuman</label>
-  </div>
-
-  <!-- Kategori: Lain-lain -->
-  <div class="category">
-    <h2>Lain-lain</h2>
-    <label><input type="checkbox"> P3K</label>
-  </div>
-
-  <button onclick="resetChecklist()">Reset Checklist</button>
-
-  <script>
-    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-    const progressBar = document.getElementById("progressBar");
-
-    checkboxes.forEach(cb => {
-      cb.addEventListener("change", updateProgress);
-    });
-
-    function updateProgress() {
-      const total = checkboxes.length;
-      const checked = document.querySelectorAll('input[type="checkbox"]:checked').length;
-      const percent = Math.round((checked / total) * 100);
-      progressBar.style.width = percent + "%";
-      progressBar.textContent = percent + "%";
-    }
-
-    function resetChecklist() {
-      checkboxes.forEach(cb => cb.checked = false);
-      updateProgress();
-    }
-  </script>
-</body>
-</html>
+‎import React, { useState, useEffect } from "react";
+‎import { Card, CardContent, CardHeader, CardTitle } from "/components/ui/card";
+‎import { Button } from "/components/ui/button";
+‎
+‎declare global {
+‎  interface Window {
+‎    L: any;
+‎  }
+‎}
+‎
+‎const JawaMountainsExplorer = () => {
+‎  const [selectedMountain, setSelectedMountain] = useState<any>(null);
+‎  const [isModalOpen, setIsModalOpen] = useState(false);
+‎
+‎  // Data gunung di Pulau Jawa
+‎  const mountains = [
+‎    {
+‎      id: 1,
+‎      name: "Gunung Semeru",
+‎      height: "3,676 mdpl",
+‎      location: "Jawa Timur",
+‎      coordinates: [-8.108, 112.921],
+‎      difficulty: "Sulit",
+‎      bestSeason: "April - Oktober",
+‎      description: "Gunung tertinggi di Pulau Jawa dengan kawah Jonggring Saloko yang aktif.",
+‎      supplies: [
+‎        "Tenda tahan angin",
+‎        "Sleeping bag untuk suhu dingin",
+‎        "Jaket gunung tebal",
+‎        "Headlamp ekstra",
+‎        "Masker debu",
+‎        "Tongkat trekking",
+‎        "Perlengkapan masak portable",
+‎        "Makanan tinggi kalori"
+‎      ]
+‎    },
+‎    {
+‎      id: 2,
+‎      name: "Gunung Bromo",
+‎      height: "2,329 mdpl",
+‎      location: "Jawa Timur",
+‎      coordinates: [-7.942, 112.953],
+‎      difficulty: "Sedang",
+‎      bestSeason: "Mei - Oktober",
+‎      description: "Gunung berapi aktif dengan pemandangan matahari terbit yang spektakuler.",
+‎      supplies: [
+‎        "Masker debu vulkanik",
+‎        "Kacamata pelindung",
+‎        "Jaket hangat",
+‎        "Sepatu trekking",
+‎        "Air minum cukup",
+‎        "Snack energi",
+‎        "Kamera",
+‎        "Senter"
+‎      ]
+‎    },
+‎    {
+‎      id: 3,
+‎      name: "Gunung Merapi",
+‎      height: "2,930 mdpl",
+‎      location: "Jawa Tengah",
+‎      coordinates: [-7.542, 110.442],
+‎      difficulty: "Sulit",
+‎      bestSeason: "April - Oktober",
+‎      description: "Salah satu gunung api teraktif di Indonesia dengan pemandangan yang dramatis.",
+‎      supplies: [
+‎        "Masker debu vulkanik",
+‎        "Helm pengaman",
+‎        "Jaket tahan angin",
+‎        "Sepatu trekking berkualitas",
+‎        "GPS tracker",
+‎        "Komunikasi radio",
+‎        "Perlengkapan P3K lengkap",
+‎        "Makanan darurat"
+‎      ]
+‎    },
+‎    {
+‎      id: 4,
+‎      name: "Gunung Prau",
+‎      height: "2,565 mdpl",
+‎      location: "Jawa Tengah",
+‎      coordinates: [-7.188, 109.991],
+‎      difficulty: "Mudah-Sedang",
+‎      bestSeason: "April - November",
+‎      description: "Gunung dengan padang edelweis dan pemandangan 360 derajat.",
+‎      supplies: [
+‎        "Tenda lightweight",
+‎        "Sleeping bag",
+‎        "Jaket hangat",
+‎        "Camera",
+‎        "Tripod",
+‎        "Makanan ringan",
+‎        "Air minum",
+‎        "Plastik sampah"
+‎      ]
+‎    },
+‎    {
+‎      id: 5,
+‎      name: "Gunung Gede Pangrango",
+‎      height: "2,958 mdpl",
+‎      location: "Jawa Barat",
+‎      coordinates: [-6.784, 106.983],
+‎      difficulty: "Sedang",
+‎      bestSeason: "Juni - September",
+‎      description: "Taman Nasional dengan keanekaragaman hayati dan kawah yang indah.",
+‎      supplies: [
+‎        "Jas hujan",
+‎        "Sepatu waterproof",
+‎        "Trekking pole",
+‎        "Air minum 3L",
+‎        "Makanan energi",
+‎        "Peta jalur pendakian",
+‎        "Pelindung hujan untuk tas",
+‎        "Obat nyamuk"
+‎      ]
+‎    },
+‎    {
+‎      id: 6,
+‎      name: "Gunung Ciremai",
+‎      height: "3,078 mdpl",
+‎      location: "Jawa Barat",
+‎      coordinates: [-6.892, 108.402],
+‎      difficulty: "Sedang-Sulit",
+‎      bestSeason: "Mei - Oktober",
+‎      description: "Gunung tertinggi di Jawa Barat dengan jalur pendakian yang bervariasi.",
+‎      supplies: [
+‎        "Tenda 4 musim",
+‎        "Matras isolasi",
+‎        "Jaket gunung",
+‎        "Sarung tangan",
+‎        "Krim pelindung UV",
+‎        "Tabir surya",
+‎        "Makanan tinggi protein",
+‎        "Korek api waterproof"
+‎      ]
+‎    },
+‎    {
+‎      id: 7,
+‎      name: "Gunung Lawu",
+‎      height: "3,265 mdpl",
+‎      location: "Jawa Tengah",
+‎      coordinates: [-7.626, 111.194],
+‎      difficulty: "Sedang",
+‎      bestSeason: "April - November",
+‎      description: "Gunung dengan nilai spiritual tinggi dan pemandangan yang memukau.",
+‎      supplies: [
+‎        "Pakaian ganti",
+‎        "Jaket tebal",
+‎        "Senter/headlamp",
+‎        "Plastik sampah",
+‎        "Makanan praktis",
+‎        "Air minum",
+‎        "Obat-obatan pribadi",
+‎        "Uang tunai"
+‎      ]
+‎    },
+‎    {
+‎      id: 8,
+‎      name: "Gunung Slamet",
+‎      height: "3,428 mdpl",
+‎      location: "Jawa Tengah",
+‎      coordinates: [-7.239, 109.216],
+‎      difficulty: "Sulit",
+‎      bestSeason: "Juni - September",
+‎      description: "Gunung berapi aktif tertinggi di Jawa Tengah dengan medan yang menantang.",
+‎      supplies: [
+‎        "Masker gas",
+‎        "Helm pendakian",
+‎        "Jaket tahan api",
+‎        "Sepatu tracking berkualitas",
+‎        "Kompor portable",
+‎        "Makanan darurat",
+‎        "Radio komun
