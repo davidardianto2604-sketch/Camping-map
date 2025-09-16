@@ -1,173 +1,557 @@
-‎import React, { useState, useEffect } from "react";
-‎import { Card, CardContent, CardHeader, CardTitle } from "/components/ui/card";
-‎import { Button } from "/components/ui/button";
-‎
-‎declare global {
-‎  interface Window {
-‎    L: any;
-‎  }
-‎}
-‎
-‎const JawaMountainsExplorer = () => {
-‎  const [selectedMountain, setSelectedMountain] = useState<any>(null);
-‎  const [isModalOpen, setIsModalOpen] = useState(false);
-‎
-‎  // Data gunung di Pulau Jawa
-‎  const mountains = [
-‎    {
-‎      id: 1,
-‎      name: "Gunung Semeru",
-‎      height: "3,676 mdpl",
-‎      location: "Jawa Timur",
-‎      coordinates: [-8.108, 112.921],
-‎      difficulty: "Sulit",
-‎      bestSeason: "April - Oktober",
-‎      description: "Gunung tertinggi di Pulau Jawa dengan kawah Jonggring Saloko yang aktif.",
-‎      supplies: [
-‎        "Tenda tahan angin",
-‎        "Sleeping bag untuk suhu dingin",
-‎        "Jaket gunung tebal",
-‎        "Headlamp ekstra",
-‎        "Masker debu",
-‎        "Tongkat trekking",
-‎        "Perlengkapan masak portable",
-‎        "Makanan tinggi kalori"
-‎      ]
-‎    },
-‎    {
-‎      id: 2,
-‎      name: "Gunung Bromo",
-‎      height: "2,329 mdpl",
-‎      location: "Jawa Timur",
-‎      coordinates: [-7.942, 112.953],
-‎      difficulty: "Sedang",
-‎      bestSeason: "Mei - Oktober",
-‎      description: "Gunung berapi aktif dengan pemandangan matahari terbit yang spektakuler.",
-‎      supplies: [
-‎        "Masker debu vulkanik",
-‎        "Kacamata pelindung",
-‎        "Jaket hangat",
-‎        "Sepatu trekking",
-‎        "Air minum cukup",
-‎        "Snack energi",
-‎        "Kamera",
-‎        "Senter"
-‎      ]
-‎    },
-‎    {
-‎      id: 3,
-‎      name: "Gunung Merapi",
-‎      height: "2,930 mdpl",
-‎      location: "Jawa Tengah",
-‎      coordinates: [-7.542, 110.442],
-‎      difficulty: "Sulit",
-‎      bestSeason: "April - Oktober",
-‎      description: "Salah satu gunung api teraktif di Indonesia dengan pemandangan yang dramatis.",
-‎      supplies: [
-‎        "Masker debu vulkanik",
-‎        "Helm pengaman",
-‎        "Jaket tahan angin",
-‎        "Sepatu trekking berkualitas",
-‎        "GPS tracker",
-‎        "Komunikasi radio",
-‎        "Perlengkapan P3K lengkap",
-‎        "Makanan darurat"
-‎      ]
-‎    },
-‎    {
-‎      id: 4,
-‎      name: "Gunung Prau",
-‎      height: "2,565 mdpl",
-‎      location: "Jawa Tengah",
-‎      coordinates: [-7.188, 109.991],
-‎      difficulty: "Mudah-Sedang",
-‎      bestSeason: "April - November",
-‎      description: "Gunung dengan padang edelweis dan pemandangan 360 derajat.",
-‎      supplies: [
-‎        "Tenda lightweight",
-‎        "Sleeping bag",
-‎        "Jaket hangat",
-‎        "Camera",
-‎        "Tripod",
-‎        "Makanan ringan",
-‎        "Air minum",
-‎        "Plastik sampah"
-‎      ]
-‎    },
-‎    {
-‎      id: 5,
-‎      name: "Gunung Gede Pangrango",
-‎      height: "2,958 mdpl",
-‎      location: "Jawa Barat",
-‎      coordinates: [-6.784, 106.983],
-‎      difficulty: "Sedang",
-‎      bestSeason: "Juni - September",
-‎      description: "Taman Nasional dengan keanekaragaman hayati dan kawah yang indah.",
-‎      supplies: [
-‎        "Jas hujan",
-‎        "Sepatu waterproof",
-‎        "Trekking pole",
-‎        "Air minum 3L",
-‎        "Makanan energi",
-‎        "Peta jalur pendakian",
-‎        "Pelindung hujan untuk tas",
-‎        "Obat nyamuk"
-‎      ]
-‎    },
-‎    {
-‎      id: 6,
-‎      name: "Gunung Ciremai",
-‎      height: "3,078 mdpl",
-‎      location: "Jawa Barat",
-‎      coordinates: [-6.892, 108.402],
-‎      difficulty: "Sedang-Sulit",
-‎      bestSeason: "Mei - Oktober",
-‎      description: "Gunung tertinggi di Jawa Barat dengan jalur pendakian yang bervariasi.",
-‎      supplies: [
-‎        "Tenda 4 musim",
-‎        "Matras isolasi",
-‎        "Jaket gunung",
-‎        "Sarung tangan",
-‎        "Krim pelindung UV",
-‎        "Tabir surya",
-‎        "Makanan tinggi protein",
-‎        "Korek api waterproof"
-‎      ]
-‎    },
-‎    {
-‎      id: 7,
-‎      name: "Gunung Lawu",
-‎      height: "3,265 mdpl",
-‎      location: "Jawa Tengah",
-‎      coordinates: [-7.626, 111.194],
-‎      difficulty: "Sedang",
-‎      bestSeason: "April - November",
-‎      description: "Gunung dengan nilai spiritual tinggi dan pemandangan yang memukau.",
-‎      supplies: [
-‎        "Pakaian ganti",
-‎        "Jaket tebal",
-‎        "Senter/headlamp",
-‎        "Plastik sampah",
-‎        "Makanan praktis",
-‎        "Air minum",
-‎        "Obat-obatan pribadi",
-‎        "Uang tunai"
-‎      ]
-‎    },
-‎    {
-‎      id: 8,
-‎      name: "Gunung Slamet",
-‎      height: "3,428 mdpl",
-‎      location: "Jawa Tengah",
-‎      coordinates: [-7.239, 109.216],
-‎      difficulty: "Sulit",
-‎      bestSeason: "Juni - September",
-‎      description: "Gunung berapi aktif tertinggi di Jawa Tengah dengan medan yang menantang.",
-‎      supplies: [
-‎        "Masker gas",
-‎        "Helm pendakian",
-‎        "Jaket tahan api",
-‎        "Sepatu tracking berkualitas",
-‎        "Kompor portable",
-‎        "Makanan darurat",
-‎        "Radio komun
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "/components/ui/card";
+import { Button } from "/components/ui/button";
+
+declare global {
+  interface Window {
+    L: any;
+  }
+}
+
+const JawaMountainsExplorer = () => {
+  const [selectedMountain, setSelectedMountain] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Data gunung di Pulau Jawa
+  const mountains = [
+    {
+      id: 1,
+      name: "Gunung Semeru",
+      height: "3,676 mdpl",
+      location: "Jawa Timur",
+      coordinates: [-8.108, 112.921],
+      difficulty: "Sulit",
+      bestSeason: "April - Oktober",
+      description: "Gunung tertinggi di Pulau Jawa dengan kawah Jonggring Saloko yang aktif.",
+      supplies: [
+        "Tenda tahan angin",
+        "Sleeping bag untuk suhu dingin",
+        "Jaket gunung tebal",
+        "Headlamp ekstra",
+        "Masker debu",
+        "Tongkat trekking",
+        "Perlengkapan masak portable",
+        "Makanan tinggi kalori"
+      ]
+    },
+    {
+      id: 2,
+      name: "Gunung Bromo",
+      height: "2,329 mdpl",
+      location: "Jawa Timur",
+      coordinates: [-7.942, 112.953],
+      difficulty: "Sedang",
+      bestSeason: "Mei - Oktober",
+      description: "Gunung berapi aktif dengan pemandangan matahari terbit yang spektakuler.",
+      supplies: [
+        "Masker debu vulkanik",
+        "Kacamata pelindung",
+        "Jaket hangat",
+        "Sepatu trekking",
+        "Air minum cukup",
+        "Snack energi",
+        "Kamera",
+        "Senter"
+      ]
+    },
+    {
+      id: 3,
+      name: "Gunung Merapi",
+      height: "2,930 mdpl",
+      location: "Jawa Tengah",
+      coordinates: [-7.542, 110.442],
+      difficulty: "Sulit",
+      bestSeason: "April - Oktober",
+      description: "Salah satu gunung api teraktif di Indonesia dengan pemandangan yang dramatis.",
+      supplies: [
+        "Masker debu vulkanik",
+        "Helm pengaman",
+        "Jaket tahan angin",
+        "Sepatu trekking berkualitas",
+        "GPS tracker",
+        "Komunikasi radio",
+        "Perlengkapan P3K lengkap",
+        "Makanan darurat"
+      ]
+    },
+    {
+      id: 4,
+      name: "Gunung Prau",
+      height: "2,565 mdpl",
+      location: "Jawa Tengah",
+      coordinates: [-7.188, 109.991],
+      difficulty: "Mudah-Sedang",
+      bestSeason: "April - November",
+      description: "Gunung dengan padang edelweis dan pemandangan 360 derajat.",
+      supplies: [
+        "Tenda lightweight",
+        "Sleeping bag",
+        "Jaket hangat",
+        "Camera",
+        "Tripod",
+        "Makanan ringan",
+        "Air minum",
+        "Plastik sampah"
+      ]
+    },
+    {
+      id: 5,
+      name: "Gunung Gede Pangrango",
+      height: "2,958 mdpl",
+      location: "Jawa Barat",
+      coordinates: [-6.784, 106.983],
+      difficulty: "Sedang",
+      bestSeason: "Juni - September",
+      description: "Taman Nasional dengan keanekaragaman hayati dan kawah yang indah.",
+      supplies: [
+        "Jas hujan",
+        "Sepatu waterproof",
+        "Trekking pole",
+        "Air minum 3L",
+        "Makanan energi",
+        "Peta jalur pendakian",
+        "Pelindung hujan untuk tas",
+        "Obat nyamuk"
+      ]
+    },
+    {
+      id: 6,
+      name: "Gunung Ciremai",
+      height: "3,078 mdpl",
+      location: "Jawa Barat",
+      coordinates: [-6.892, 108.402],
+      difficulty: "Sedang-Sulit",
+      bestSeason: "Mei - Oktober",
+      description: "Gunung tertinggi di Jawa Barat dengan jalur pendakian yang bervariasi.",
+      supplies: [
+        "Tenda 4 musim",
+        "Matras isolasi",
+        "Jaket gunung",
+        "Sarung tangan",
+        "Krim pelindung UV",
+        "Tabir surya",
+        "Makanan tinggi protein",
+        "Korek api waterproof"
+      ]
+    },
+    {
+      id: 7,
+      name: "Gunung Lawu",
+      height: "3,265 mdpl",
+      location: "Jawa Tengah",
+      coordinates: [-7.626, 111.194],
+      difficulty: "Sedang",
+      bestSeason: "April - November",
+      description: "Gunung dengan nilai spiritual tinggi dan pemandangan yang memukau.",
+      supplies: [
+        "Pakaian ganti",
+        "Jaket tebal",
+        "Senter/headlamp",
+        "Plastik sampah",
+        "Makanan praktis",
+        "Air minum",
+        "Obat-obatan pribadi",
+        "Uang tunai"
+      ]
+    },
+    {
+      id: 8,
+      name: "Gunung Slamet",
+      height: "3,428 mdpl",
+      location: "Jawa Tengah",
+      coordinates: [-7.239, 109.216],
+      difficulty: "Sulit",
+      bestSeason: "Juni - September",
+      description: "Gunung berapi aktif tertinggi di Jawa Tengah dengan medan yang menantang.",
+      supplies: [
+        "Masker gas",
+        "Helm pendakian",
+        "Jaket tahan api",
+        "Sepatu tracking berkualitas",
+        "Kompor portable",
+        "Makanan darurat",
+        "Radio komunikasi",
+        "Peralatan navigasi"
+      ]
+    }
+  ];
+
+  useEffect(() => {
+    // Load Leaflet CSS and JS
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = "https://unpkg.com/leaflet@1.7.1/dist/leaflet.css";
+    document.head.appendChild(link);
+
+    const script = document.createElement("script");
+    script.src = "https://unpkg.com/leaflet@1.7.1/dist/leaflet.js";
+    script.onload = initializeMap;
+    document.body.appendChild(script);
+
+    return () => {
+      document.head.removeChild(link);
+      document.body.removeChild(script);
+    };
+  }, []);
+
+  const initializeMap = () => {
+    if (typeof window.L === "undefined") return;
+
+    // Initialize map
+    const map = window.L.map("map").setView([-7.5, 110], 8);
+
+    // Add tile layer
+    window.L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // Add markers for each mountain
+    mountains.forEach(mountain => {
+      const marker = window.L.marker(mountain.coordinates).addTo(map);
+      marker.bindPopup(`
+        <div class="p-2">
+          <h3 class="font-bold">${mountain.name}</h3>
+          <p>Tinggi: ${mountain.height}</p>
+          <button onclick="window.openMountainModal(${mountain.id})" class="mt-2 px-3 py-1 bg-blue-500 text-white rounded">
+            Lihat Detail
+          </button>
+        </div>
+      `);
+    });
+
+    // Make openMountainModal function globally available
+    window.openMountainModal = (mountainId: number) => {
+      const mountain = mountains.find(m => m.id === mountainId);
+      if (mountain) {
+        setSelectedMountain(mountain);
+        setIsModalOpen(true);
+      }
+    };
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedMountain(null);
+  };
+
+  return (
+    <div className="min-h-screen bg-background text-foreground">
+      {/* Header Section */}
+      <header className="bg-primary text-primary-foreground py-8 px-4 text-center">
+        <h1 className="text-3xl font-bold mb-2">Pendakian Gunung di Pulau Jawa</h1>
+        <p className="max-w-2xl mx-auto">
+          Jelajahi keindahan gunung-gunung di Pulau Jawa dengan panduan lengkap dan checklist perlengkapan pendakian
+        </p>
+      </header>
+
+      {/* Main Content */}
+      <main className="container mx-auto px-4 py-8">
+        {/* Map Container */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-semibold mb-4">Peta Interaktif Gunung di Jawa</h2>
+          <div id="map" className="h-96 w-full rounded-lg border border-border"></div>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Klik pada marker untuk melihat informasi gunung dan tombol detail
+          </p>
+        </div>
+
+        {/* Mountain Gallery */}
+        <section className="mb-12">
+          <h2 className="text-2xl font-semibold mb-6">Daftar Gunung di Pulau Jawa</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {/* Gunung Semeru */}
+            <Card className="overflow-hidden">
+              <div className="h-48 overflow-hidden">
+                <img 
+                  src="https://placeholder-image-service.onrender.com/image/400x300?prompt=Mount Semeru volcano with smoking crater and dramatic landscape&id=semeru-001" 
+                  alt="Gunung Semeru dengan kawah berasap dan pemandangan dramatis" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <CardHeader>
+                <CardTitle>Gunung Semeru</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">Tinggi: 3,676 mdpl</p>
+                <p className="text-muted-foreground">Lokasi: Jawa Timur</p>
+                <Button 
+                  className="w-full mt-4" 
+                  onClick={() => {
+                    setSelectedMountain(mountains[0]);
+                    setIsModalOpen(true);
+                  }}
+                >
+                  Lihat Detail
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Gunung Bromo */}
+            <Card className="overflow-hidden">
+              <div className="h-48 overflow-hidden">
+                <img 
+                  src="https://placeholder-image-service.onrender.com/image/400x300?prompt=Mount Bromo with sea of sand and sunrise view&id=bromo-002" 
+                  alt="Gunung Bromo dengan laut pasir dan pemandangan matahari terbit" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <CardHeader>
+                <CardTitle>Gunung Bromo</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">Tinggi: 2,329 mdpl</p>
+                <p className="text-muted-foreground">Lokasi: Jawa Timur</p>
+                <Button 
+                  className="w-full mt-4" 
+                  onClick={() => {
+                    setSelectedMountain(mountains[1]);
+                    setIsModalOpen(true);
+                  }}
+                >
+                  Lihat Detail
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Gunung Merapi */}
+            <Card className="overflow-hidden">
+              <div className="h-48 overflow-hidden">
+                <img 
+                  src="https://placeholder-image-service.onrender.com/image/400x300?prompt=Mount Merapi volcano with smoke plume and steep slopes&id=merapi-003" 
+                  alt="Gunung Merapi dengan kepulan asap dan lereng curam" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <CardHeader>
+                <CardTitle>Gunung Merapi</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">Tinggi: 2,930 mdpl</p>
+                <p className="text-muted-foreground">Lokasi: Jawa Tengah</p>
+                <Button 
+                  className="w-full mt-4" 
+                  onClick={() => {
+                    setSelectedMountain(mountains[2]);
+                    setIsModalOpen(true);
+                  }}
+                >
+                  Lihat Detail
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Gunung Prau */}
+            <Card className="overflow-hidden">
+              <div className="h-48 overflow-hidden">
+                <img 
+                  src="https://placeholder-image-service.onrender.com/image/400x300?prompt=Mount Prau with edelweiss flowers and panoramic view&id=prau-004" 
+                  alt="Gunung Prau dengan bunga edelweiss dan pemandangan panorama" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <CardHeader>
+                <CardTitle>Gunung Prau</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">Tinggi: 2,565 mdpl</p>
+                <p className="text-muted-foreground">Lokasi: Jawa Tengah</p>
+                <Button 
+                  className="w-full mt-4" 
+                  onClick={() => {
+                    setSelectedMountain(mountains[3]);
+                    setIsModalOpen(true);
+                  }}
+                >
+                  Lihat Detail
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Gunung Gede Pangrango */}
+            <Card className="overflow-hidden">
+              <div className="h-48 overflow-hidden">
+                <img 
+                  src="https://placeholder-image-service.onrender.com/image/400x300?prompt=Mount Gede Pangrango with lush forest and misty peaks&id=gede-005" 
+                  alt="Gunung Gede Pangrango dengan hutan lebat dan puncak berkabut" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <CardHeader>
+                <CardTitle>Gunung Gede Pangrango</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">Tinggi: 2,958 mdpl</p>
+                <p className="text-muted-foreground">Lokasi: Jawa Barat</p>
+                <Button 
+                  className="w-full mt-4" 
+                  onClick={() => {
+                    setSelectedMountain(mountains[4]);
+                    setIsModalOpen(true);
+                  }}
+                >
+                  Lihat Detail
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Gunung Ciremai */}
+            <Card className="overflow-hidden">
+              <div className="h-48 overflow-hidden">
+                <img 
+                  src="https://placeholder-image-service.onrender.com/image/400x300?prompt=Mount Ciremai with volcanic cone and cloud cover&id=ciremai-006" 
+                  alt="Gunung Ciremai dengan kerucut vulkanik dan tutupan awan" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <CardHeader>
+                <CardTitle>Gunung Ciremai</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">Tinggi: 3,078 mdpl</p>
+                <p className="text-muted-foreground">Lokasi: Jawa Barat</p>
+                <Button 
+                  className="w-full mt-4" 
+                  onClick={() => {
+                    setSelectedMountain(mountains[5]);
+                    setIsModalOpen(true);
+                  }}
+                >
+                  Lihat Detail
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Gunung Lawu */}
+            <Card className="overflow-hidden">
+              <div className="h-48 overflow-hidden">
+                <img 
+                  src="https://placeholder-image-service.onrender.com/image/400x300?prompt=Mount Lawu with spiritual atmosphere and ancient temples&id=lawu-007" 
+                  alt="Gunung Lawu dengan atmosfer spiritual dan candi kuno" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <CardHeader>
+                <CardTitle>Gunung Lawu</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">Tinggi: 3,265 mdpl</p>
+                <p className="text-muted-foreground">Lokasi: Jawa Tengah</p>
+                <Button 
+                  className="w-full mt-4" 
+                  onClick={() => {
+                    setSelectedMountain(mountains[6]);
+                    setIsModalOpen(true);
+                  }}
+                >
+                  Lihat Detail
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Gunung Slamet */}
+            <Card className="overflow-hidden">
+              <div className="h-48 overflow-hidden">
+                <img 
+                  src="https://placeholder-image-service.onrender.com/image/400x300?prompt=Mount Slamet with active fumaroles and challenging terrain&id=slamet-008" 
+                  alt="Gunung Slamet dengan fumarol aktif dan medan menantang" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <CardHeader>
+                <CardTitle>Gunung Slamet</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">Tinggi: 3,428 mdpl</p>
+                <p className="text-muted-foreground">Lokasi: Jawa Tengah</p>
+                <Button 
+                  className="w-full mt-4" 
+                  onClick={() => {
+                    setSelectedMountain(mountains[7]);
+                    setIsModalOpen(true);
+                  }}
+                >
+                  Lihat Detail
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+      </main>
+
+      {/* Modal for Mountain Details */}
+      {isModalOpen && selectedMountain && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-background rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-2xl font-bold">{selectedMountain.name}</h2>
+                <button 
+                  onClick={closeModal}
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  ✕
+                </button>
+              </div>
+              
+              <div className="h-64 mb-4 overflow-hidden rounded">
+                <img 
+                  src={`https://placeholder-image-service.onrender.com/image/600x400?prompt=${encodeURIComponent(selectedMountain.name + " mountain landscape")}&id=mountain-${selectedMountain.id}`} 
+                  alt={`Pemandangan Gunung ${selectedMountain.name}`}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <h3 className="font-semibold">Ketinggian</h3>
+                  <p>{selectedMountain.height}</p>
+                </div>
+                <div>
+                  <h3 className="font-semibold">Lokasi</h3>
+                  <p>{selectedMountain.location}</p>
+                </div>
+                <div>
+                  <h3 className="font-semibold">Tingkat Kesulitan</h3>
+                  <p>{selectedMountain.difficulty}</p>
+                </div>
+                <div>
+                  <h3 className="font-semibold">Musim Terbaik</h3>
+                  <p>{selectedMountain.bestSeason}</p>
+                </div>
+              </div>
+              
+              <div className="mb-4">
+                <h3 className="font-semibold mb-2">Deskripsi</h3>
+                <p>{selectedMountain.description}</p>
+              </div>
+              
+              <div>
+                <h3 className="font-semibold mb-2">Checklist Perlengkapan Pendakian</h3>
+                <div className="border rounded divide-y">
+                  {selectedMountain.supplies.map((item: string, index: number) => (
+                    <div key={index} className="p-3 flex items-center">
+                      <input 
+                        type="checkbox" 
+                        id={`item-${selectedMountain.id}-${index}`}
+                        className="mr-3 h-4 w-4"
+                      />
+                      <label htmlFor={`item-${selectedMountain.id}-${index}`}>
+                        {item}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="mt-6 flex justify-end">
+                <Button onClick={closeModal}>Tutup</Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default JawaMountainsExplorer;
