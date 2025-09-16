@@ -1,73 +1,592 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Camping Map - Gunung di Jawa Tengah</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Camping Map — Demo Planner</title>
+
+<!-- Bootstrap 5 -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Leaflet -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+<style>
+  body { background:#f6f8fb; font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
+  .hero { background:#0f172a; color:white; padding:18px 12px; text-align:center; }
+  .mountain-img { height:180px; object-fit:cover; border-radius:6px 6px 0 0; }
+  .card-mountain { overflow:hidden; border-radius:8px; box-shadow:0 6px 20px rgba(13,20,40,0.06); }
+  .small-muted { color:#6b7280; font-size:0.9rem; }
+  #mapPlan { height:260px; border-radius:8px; }
+  .tag { font-size:0.85rem; padding:2px 8px; border-radius:999px; background:#e6eef8; color:#0b63d3; }
+  .completed { background: linear-gradient(90deg,#16a34a,#84cc16); color:white; }
+</style>
 </head>
-<body class="bg-gray-100">
+<body>
 
-  <header class="bg-green-700 text-white p-6 text-center">
-    <h1 class="text-3xl font-bold">Camping Map - Gunung di Jawa Tengah</h1>
-    <p class="text-sm">Informasi Jalur Pendakian, Foto, dan Tautan Google Maps</p>
-  </header>
+<header class="hero">
+  <h1 class="mb-1">Camping Map — Planner Demo</h1>
+  <div class="small-muted">Login → Pilih gunung → Rencanakan tanggal/jalur → Checklist → Selesai</div>
+</header>
 
-  <main class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<main class="container my-4">
 
-    <!-- Gunung Slamet -->
-    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/0/0b/Mount_Slamet.jpg" alt="Gunung Slamet" class="w-full h-48 object-cover">
-      <div class="p-4">
-        <h2 class="text-xl font-semibold">Gunung Slamet (3.428 mdpl)</h2>
-        <p class="text-gray-600 text-sm mt-2">
-          Gunung tertinggi di Jawa Tengah. Terletak di perbatasan Banyumas, Purbalingga, Pemalang, Tegal, dan Brebes.
-        </p>
-        <ul class="list-disc list-inside text-sm mt-2 text-gray-700">
-          <li><a href="https://maps.app.goo.gl/JXuE9Zq6uXJ7Q1mH7" target="_blank" class="text-green-600 font-semibold">Jalur Bambangan (Purbalingga)</a></li>
-          <li><a href="https://maps.app.goo.gl/HWjFkLh3w4E88vGc6" target="_blank" class="text-green-600 font-semibold">Jalur Baturaden (Banyumas)</a></li>
-          <li><a href="https://maps.app.goo.gl/5z5E53A2y31QAxF98" target="_blank" class="text-green-600 font-semibold">Jalur Jurangmangu (Pemalang)</a></li>
-          <li><a href="https://maps.app.goo.gl/mM83k9X7bQgkUfbD6" target="_blank" class="text-green-600 font-semibold">Jalur Guci (Tegal)</a></li>
-        </ul>
-        <a href="https://www.google.com/maps/place/Gunung+Slamet" target="_blank" class="block mt-3 text-green-700 font-bold">📍 Lihat Puncak Gunung Slamet</a>
+  <!-- LOGIN -->
+  <section id="loginSection" class="card p-4 mb-4">
+    <h5>Masuk / Buat Akun (Demo)</h5>
+    <div class="row g-2 align-items-center">
+      <div class="col-sm-5">
+        <input id="inputName" class="form-control" placeholder="Nama Anda (mis: david)" />
+      </div>
+      <div class="col-auto">
+        <button id="btnLogin" class="btn btn-primary">Masuk</button>
+      </div>
+      <div class="col-12 pt-2 small text-muted">Ini demo: cukup gunakan nama. Nanti tinggal integrasi Firebase untuk autentikasi nyata.</div>
+    </div>
+  </section>
+
+  <!-- APP - Hidden until login -->
+  <div id="app" class="d-none">
+
+    <!-- Header user -->
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <div>
+        <h4 id="welcomeUser" class="mb-0">Halo, User</h4>
+        <div class="small-muted" id="currentUserEmail">—</div>
+      </div>
+      <div class="text-end">
+        <button id="btnLogout" class="btn btn-outline-secondary">Logout</button>
       </div>
     </div>
 
-    <!-- Gunung Merbabu -->
-    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/7/7e/Merbabu_Mountain_View.jpg" alt="Gunung Merbabu" class="w-full h-48 object-cover">
-      <div class="p-4">
-        <h2 class="text-xl font-semibold">Gunung Merbabu (3.145 mdpl)</h2>
-        <p class="text-gray-600 text-sm mt-2">
-          Gunung bersebelahan dengan Merapi, terkenal dengan padang sabana luas dan bunga edelweis.
-        </p>
-        <ul class="list-disc list-inside text-sm mt-2 text-gray-700">
-          <li><a href="https://maps.app.goo.gl/WcTHhx2HYNccwXJ77" target="_blank" class="text-green-600 font-semibold">Jalur Selo (Boyolali)</a></li>
-          <li><a href="https://maps.app.goo.gl/C8DK9K6xX16YkA3T9" target="_blank" class="text-green-600 font-semibold">Jalur Wekas (Magelang)</a></li>
-          <li><a href="https://maps.app.goo.gl/2Dn9gWoV3C7qgQvj7" target="_blank" class="text-green-600 font-semibold">Jalur Cuntel (Semarang)</a></li>
-          <li><a href="https://maps.app.goo.gl/tTtydxs7MWZcH7qv9" target="_blank" class="text-green-600 font-semibold">Jalur Thekelan (Kopeng)</a></li>
-        </ul>
-        <a href="https://www.google.com/maps/place/Gunung+Merbabu" target="_blank" class="block mt-3 text-green-700 font-bold">📍 Lihat Puncak Gunung Merbabu</a>
+    <!-- Step 1: Pilih gunung -->
+    <section class="mb-4">
+      <h5 class="mb-3">Pilih Gunung yang Ingin Kamu Daki</h5>
+      <div id="mountainGrid" class="row g-3">
+        <!-- Cards generated by JS -->
       </div>
-    </div>
+    </section>
 
-    <!-- Gunung Merapi -->
-    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/4/45/Mount_Merapi_in_the_Morning.jpg" alt="Gunung Merapi" class="w-full h-48 object-cover">
-      <div class="p-4">
-        <h2 class="text-xl font-semibold">Gunung Merapi (2.930 mdpl)</h2>
-        <p class="text-gray-600 text-sm mt-2">
-          Gunung api paling aktif di Indonesia. Terletak di perbatasan Yogyakarta dan Jawa Tengah.
-        </p>
-        <ul class="list-disc list-inside text-sm mt-2 text-gray-700">
-          <li><a href="https://maps.app.goo.gl/MUoQ3YtX8pPb9htX6" target="_blank" class="text-green-600 font-semibold">Jalur Selo (Boyolali)</a></li>
-          <li><a href="https://maps.app.goo.gl/xDkHVh44qfWovWfA9" target="_blank" class="text-green-600 font-semibold">Jalur Babadan (Magelang)</a></li>
-        </ul>
-        <a href="https://www.google.com/maps/place/Gunung+Merapi" target="_blank" class="block mt-3 text-green-700 font-bold">📍 Lihat Puncak Gunung Merapi</a>
+    <!-- Step 2: Detail Gunung (appears when a mountain selected) -->
+    <section id="detailSection" class="mb-4 d-none">
+      <div class="card p-3">
+        <div class="row g-3">
+          <div class="col-md-5">
+            <img id="detailImg" class="w-100 mountain-img" src="" alt="Gunung">
+          </div>
+          <div class="col-md-7">
+            <h3 id="detailName"></h3>
+            <div class="small-muted mb-2" id="detailMeta"></div>
+            <p id="detailDesc"></p>
+
+            <h6 class="mt-3">Jalur Pendakian</h6>
+            <ul id="detailRoutes" class="small"></ul>
+
+            <div class="mt-3">
+              <button id="btnStartPlan" class="btn btn-success">Mulai Perencanaan</button>
+              <a id="linkPeak" class="btn btn-outline-primary ms-2" target="_blank">Lihat Puncak di Google Maps</a>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+    </section>
 
-  </main>
+    <!-- Step 3: Perencanaan & Checklist -->
+    <section id="planSection" class="d-none">
+      <div class="card p-3 mb-3">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <h5>Rencana Pendakian</h5>
+            <div class="mb-2">
+              <label class="form-label">Tanggal Pendakian</label>
+              <input id="planDate" class="form-control" type="date" />
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Pilih Jalur</label>
+              <select id="planRoute" class="form-select"></select>
+            </div>
 
+            <div class="mt-3">
+              <button id="btnSavePlan" class="btn btn-primary">Simpan Rencana</button>
+              <button id="btnOpenMaps" class="btn btn-outline-secondary ms-2" target="_blank">Buka di Google Maps</button>
+            </div>
+            <div class="small text-success mt-2" id="planSavedMsg" style="display:none;">Rencana tersimpan ✅</div>
+          </div>
+
+          <div class="col-md-6">
+            <h5>Checklist Perlengkapan</h5>
+            <div id="checklistBox" class="mb-2"></div>
+
+            <div class="d-flex gap-2">
+              <button id="btnSaveChecklist" class="btn btn-success">💾 Simpan Checklist</button>
+              <button id="btnFinish" class="btn btn-outline-success">✅ Tandai Selesai</button>
+              <button id="btnResetChecklist" class="btn btn-outline-danger ms-auto">Reset</button>
+            </div>
+
+            <div class="mt-2">
+              <small class="small-muted">Tambahkan item khusus:</small>
+              <div class="input-group mt-1">
+                <input id="customItem" type="text" class="form-control" placeholder="Contoh: powerbank ekstra">
+                <button id="btnAddItem" class="btn btn-secondary">Tambah</button>
+              </div>
+            </div>
+
+            <div class="mt-3" id="progressRow"><small class="small-muted">Progress: <span id="progressText">0 / 0</span></small></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Map small -->
+      <div class="card p-3">
+        <h6>Preview Lokasi (map)</h6>
+        <div id="mapPlan"></div>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<footer class="text-center small muted py-3">Demo — data disimpan lokal (localStorage). Nantikan versi cloud (Firebase) agar sinkron antar perangkat.</footer>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+/* =========================
+   DATA: contoh gunung (Jawa)
+   Semua foto pakai Wikimedia thumbnail (direct) agar pasti muncul.
+   Tambahkan gunung lain sesuai kebutuhan.
+   ========================= */
+const MOUNTAINS = [
+  {
+    id: 'slamet',
+    name: 'Gunung Slamet',
+    height: '3.428 mdpl',
+    location: 'Banyumas, Purbalingga, Pemalang, Tegal, Brebes (Jateng)',
+    desc: 'Gunung tertinggi di Jawa Tengah, jalur beragam dan area luas. Persiapkan fisik & logistik.',
+    coords: [-7.242, 109.208],
+    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Gunung_Slamet_dari_Purwokerto.jpg/640px-Gunung_Slamet_dari_Purwokerto.jpg',
+    peakMaps: 'https://www.google.com/maps/place/Gunung+Slamet',
+    routes: [
+      {name: 'Bambangan (Purbalingga)', maps: 'https://maps.app.goo.gl/CiF5dQAFqAtR2j3p9'},
+      {name: 'Guci / Permadi (Tegal)', maps: 'https://maps.app.goo.gl/xwDnzMC4gwPSWmhU8'},
+      {name: 'Dipajaya (Pemalang)', maps: 'https://maps.app.goo.gl/XdA1G9bAx8yxXySh9'},
+      {name: 'Kaliwadas / Baturaden (Banyumas)', maps: 'https://maps.app.goo.gl/HWjFkLh3w4E88vGc6'}
+    ],
+    recommended: ['Tas Carrier','Tenda','Sleeping Bag','Matras','Jaket Gunung','Sepatu Gunung','Headlamp','Makanan & Air','P3K','Jas Hujan']
+  },
+  {
+    id: 'merbabu',
+    name: 'Gunung Merbabu',
+    height: '3.145 mdpl',
+    location: 'Magelang / Boyolali (Jateng)',
+    desc: 'Terkenal pemandangan padang sabana dan rute classic via Selo. Cocok untuk pendaki menengah.',
+    coords: [-7.455, 110.438],
+    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Merbabu_view_from_merapi.jpg/640px-Merbabu_view_from_merapi.jpg',
+    peakMaps: 'https://www.google.com/maps/place/Gunung+Merbabu',
+    routes: [
+      {name:'Selo (Boyolali)', maps:'https://maps.app.goo.gl/WcTHhx2HYNccwXJ77'},
+      {name:'Wekas (Magelang)', maps:'https://maps.app.goo.gl/C8DK9K6xX16YkA3T9'},
+      {name:'Cuntel', maps:'https://maps.app.goo.gl/2Dn9gWoV3C7qgQvj7'}
+    ],
+    recommended: ['Tas Carrier','Sleeping Bag','Matras','Jaket Gunung','Sepatu Gunung','Headlamp','Makanan & Air','P3K']
+  },
+  {
+    id: 'semeru',
+    name: 'Gunung Semeru',
+    height: '3.676 mdpl',
+    location: 'Lumajang / Malang (Jatim) — disertakan untuk demo lintas pulau',
+    desc: 'Puncak tertinggi pulau Jawa, pendakian panjang dengan cuaca berubah. Butuh izin dan persiapan matang.',
+    coords: [-8.108, 112.922],
+    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Mount_Semeru.jpg/640px-Mount_Semeru.jpg',
+    peakMaps: 'https://www.google.com/maps/place/Mount+Semeru',
+    routes: [
+      {name:'Ranu Pani (jalur utama)', maps:'https://maps.app.goo.gl/TGm6yWDBc7Y1U5jCA'}
+    ],
+    recommended: ['Tas Carrier','Tenda','Sleeping Bag','Matras','Jaket Gunung','Sepatu Gunung','Headlamp','Makanan & Air','P3K','Kamera']
+  }
+];
+
+/* ============ helper localStorage keys ============ */
+function userKey(u){ return `camping_user_${u}`; }
+function planKey(u, mountainId){ return `camping_plan_${u}_${mountainId}`; }
+function checklistKey(u, mountainId){ return `camping_checklist_${u}_${mountainId}`; }
+
+/* ============ App state ============ */
+let currentUser = null;
+let currentMountain = null;
+let mapPlan = null;
+let markers = [];
+
+/* ====== LOGIN FLOW ====== */
+const loginSection = document.getElementById('loginSection');
+const appDiv = document.getElementById('app');
+const inputName = document.getElementById('inputName');
+const btnLogin = document.getElementById('btnLogin');
+const btnLogout = document.getElementById('btnLogout');
+const welcomeUser = document.getElementById('welcomeUser');
+const currentUserEmail = document.getElementById('currentUserEmail');
+
+btnLogin.addEventListener('click', ()=>{
+  const name = inputName.value.trim();
+  if(!name){ alert('Masukkan nama/merek akun'); return; }
+  login(name);
+});
+
+btnLogout.addEventListener('click', ()=>{
+  logout();
+});
+
+function login(name){
+  currentUser = name;
+  // create if not exists
+  if(!localStorage.getItem(userKey(name))){
+    localStorage.setItem(userKey(name), JSON.stringify({created:Date.now()}));
+  }
+  // show app
+  loginSection.classList.add('d-none');
+  appDiv.classList.remove('d-none');
+  welcomeUser.textContent = `Halo, ${currentUser}`;
+  currentUserEmail.textContent = `Akun: ${currentUser}`;
+  renderMountainGrid();
+}
+
+/* logout */
+function logout(){
+  currentUser = null;
+  // hide app show login
+  loginSection.classList.remove('d-none');
+  appDiv.classList.add('d-none');
+  inputName.value = '';
+  // hide detail/plan sections
+  hideDetailAndPlan();
+}
+
+/* ============ MOUNTAIN GRID ============ */
+const mountainGrid = document.getElementById('mountainGrid');
+function renderMountainGrid(){
+  mountainGrid.innerHTML = '';
+  MOUNTAINS.forEach(m=>{
+    const col = document.createElement('div');
+    col.className = 'col-12 col-md-6 col-lg-4';
+    col.innerHTML = `
+      <div class="card card-mountain">
+        <img src="${m.img}" loading="lazy" alt="${m.name}" class="mountain-img w-100">
+        <div class="p-3">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <div>
+              <h5 class="mb-1">${m.name}</h5>
+              <div class="small-muted">${m.height} • ${m.location}</div>
+            </div>
+            <div><span class="tag">${m.recommended.length} items</span></div>
+          </div>
+          <p class="small-muted mb-2">${truncate(m.desc,120)}</p>
+          <div class="d-flex gap-2">
+            <button class="btn btn-outline-primary btn-sm" onclick="openDetail('${m.id}')">Detail</button>
+            <button class="btn btn-primary btn-sm" onclick="startQuickPlan('${m.id}')">Rencanakan</button>
+          </div>
+        </div>
+      </div>
+    `;
+    mountainGrid.appendChild(col);
+  });
+}
+
+function truncate(s,n){ return s.length>n ? s.slice(0,n-1)+'…' : s; }
+
+/* ============ DETAIL SECTION ============ */
+const detailSection = document.getElementById('detailSection');
+const detailImg = document.getElementById('detailImg');
+const detailName = document.getElementById('detailName');
+const detailMeta = document.getElementById('detailMeta');
+const detailDesc = document.getElementById('detailDesc');
+const detailRoutes = document.getElementById('detailRoutes');
+const btnStartPlan = document.getElementById('btnStartPlan');
+const linkPeak = document.getElementById('linkPeak');
+
+function openDetail(mId){
+  const m = MOUNTAINS.find(x=>x.id===mId);
+  if(!m) return;
+  currentMountain = m;
+  detailImg.src = m.img;
+  detailName.textContent = m.name;
+  detailMeta.textContent = `${m.height} • ${m.location}`;
+  detailDesc.textContent = m.desc;
+  // routes
+  detailRoutes.innerHTML = '';
+  m.routes.forEach(r=>{
+    const li = document.createElement('li');
+    li.innerHTML = `<a href="${r.maps}" target="_blank">${r.name}</a>`;
+    detailRoutes.appendChild(li);
+  });
+  linkPeak.href = m.peakMaps;
+  // show
+  detailSection.classList.remove('d-none');
+  // hide plan until user clicks start
+  document.getElementById('planSection').classList.add('d-none');
+  // pan map if initialized
+  if(mapPlan) mapPlan.setView(m.coords, 9);
+  // scroll to detail
+  window.scrollTo({top: detailSection.offsetTop-20, behavior:'smooth'});
+}
+
+/* quick plan: open plan directly (with default date today + first route) */
+function startQuickPlan(mId){
+  openDetail(mId);
+  setTimeout(()=> btnStartPlan.click(), 200);
+}
+
+/* when click "Mulai Perencanaan" */
+btnStartPlan.addEventListener('click', ()=>{
+  openPlanFor(currentMountain.id);
+});
+
+/* helper to hide detail & plan on logout */
+function hideDetailAndPlan(){
+  detailSection.classList.add('d-none');
+  document.getElementById('planSection').classList.add('d-none');
+}
+
+/* ============ PLAN SECTION ============ */
+const planSection = document.getElementById('planSection');
+const planDate = document.getElementById('planDate');
+const planRoute = document.getElementById('planRoute');
+const btnSavePlan = document.getElementById('btnSavePlan');
+const btnOpenMaps = document.getElementById('btnOpenMaps');
+const planSavedMsg = document.getElementById('planSavedMsg');
+const checklistBox = document.getElementById('checklistBox');
+const btnSaveChecklist = document.getElementById('btnSaveChecklist');
+const btnFinish = document.getElementById('btnFinish');
+const btnResetChecklist = document.getElementById('btnResetChecklist');
+const btnAddItem = document.getElementById('btnAddItem');
+const customItem = document.getElementById('customItem');
+const progressText = document.getElementById('progressText');
+
+btnAddItem.addEventListener('click', ()=>{
+  const v = customItem.value.trim();
+  if(!v) return;
+  addChecklistItem(v, true);
+  customItem.value = '';
+});
+
+btnSavePlan.addEventListener('click', ()=>{
+  savePlan();
+});
+
+btnOpenMaps.addEventListener('click', ()=>{
+  const sel = planRoute.value;
+  if(!sel) { alert('Pilih jalur dulu'); return; }
+  const route = currentMountain.routes.find(r=>r.name===sel);
+  if(route) window.open(route.maps, '_blank');
+});
+
+btnSaveChecklist.addEventListener('click', ()=>{
+  saveChecklist();
+  alert('Checklist tersimpan untuk rencana ini ✅');
+});
+
+btnResetChecklist.addEventListener('click', ()=>{
+  if(!confirm('Reset checklist untuk rencana ini?')) return;
+  localStorage.removeItem(checklistKey(currentUser, currentMountain.id));
+  renderChecklist(currentMountain);
+  updateProgress();
+});
+
+btnFinish.addEventListener('click', ()=>{
+  // check all checked?
+  const inputs = checklistBox.querySelectorAll('input[type="checkbox"]');
+  const total = inputs.length;
+  const checked = Array.from(inputs).filter(i=>i.checked).length;
+  if(total===0){ alert('Checklist kosong — isi dulu'); return; }
+  if(checked < total){
+    if(!confirm('Masih ada item yang belum dicentang. Tetap tandai selesai?')) return;
+  }
+  // mark plan as completed
+  const data = loadPlan(currentUser, currentMountain.id) || {};
+  data.completed = true;
+  data.completedAt = new Date().toISOString();
+  localStorage.setItem(planKey(currentUser, currentMountain.id), JSON.stringify(data));
+  // show congrats
+  showCongrats(currentMountain.name);
+});
+
+/* open plan for a mountain (render route options, date, checklist) */
+function openPlanFor(mId){
+  const m = MOUNTAINS.find(x=>x.id===mId); if(!m) return;
+  currentMountain = m;
+  detailSection.classList.remove('d-none'); // ensure detail visible
+  planSection.classList.remove('d-none');
+
+  // date default today
+  planDate.value = localStorage.getItem(planKey(currentUser, m.id)) ? JSON.parse(localStorage.getItem(planKey(currentUser, m.id))).date || '' : '';
+
+  // populate routes
+  planRoute.innerHTML = '';
+  m.routes.forEach(r=>{
+    const opt = document.createElement('option');
+    opt.value = r.name; opt.textContent = r.name;
+    planRoute.appendChild(opt);
+  });
+
+  // load saved plan to choose route
+  const saved = loadPlan(currentUser, m.id);
+  if(saved && saved.route) planRoute.value = saved.route;
+  if(saved && saved.date) planDate.value = saved.date;
+
+  // render checklist (either saved or recommended)
+  renderChecklist(m);
+
+  // show map centered
+  setTimeout(()=> {
+    if(!mapPlan){ initMapPlan(); }
+    mapPlan.setView(m.coords, 9);
+    // move marker
+    if(mapPlan._myMarker){ mapPlan._myMarker.setLatLng(m.coords); } else {
+      mapPlan._myMarker = L.marker(m.coords).addTo(mapPlan).bindPopup(m.name);
+    }
+  }, 120);
+
+  window.scrollTo({top: planSection.offsetTop-20, behavior:'smooth'});
+}
+
+function savePlan(){
+  if(!currentUser || !currentMountain) return;
+  const data = {
+    date: planDate.value || '',
+    route: planRoute.value || ''
+  };
+  localStorage.setItem(planKey(currentUser, currentMountain.id), JSON.stringify(data));
+  planSavedMsg.style.display = 'block';
+  setTimeout(()=> planSavedMsg.style.display = 'none', 1800);
+}
+
+/* ============ CHECKLIST render/save/load ============ */
+function renderChecklist(m){
+  checklistBox.innerHTML = '';
+  // try load saved checklist for user+mountain
+  const saved = JSON.parse(localStorage.getItem(checklistKey(currentUser, m.id)) || 'null');
+  let items = [];
+  if(saved && Array.isArray(saved.items)){
+    items = saved.items;
+  } else {
+    // default recommended items
+    items = m.recommended.map(label => ({label, checked:false, custom:false}));
+  }
+  // save items in DOM
+  items.forEach((it, idx) => {
+    const id = `chk_${m.id}_${idx}`;
+    const div = document.createElement('div');
+    div.className = 'form-check';
+    div.innerHTML = `<input class="form-check-input" type="checkbox" id="${id}" ${it.checked ? 'checked' : ''}>
+                     <label class="form-check-label" for="${id}">${it.label}${it.custom ? ' (custom)' : ''}</label>`;
+    checklistBox.appendChild(div);
+    // event
+    div.querySelector('input').addEventListener('change', ()=> {
+      // update local saved
+      const cur = JSON.parse(localStorage.getItem(checklistKey(currentUser, m.id)) || 'null') || {items: items};
+      cur.items[idx].checked = div.querySelector('input').checked;
+      localStorage.setItem(checklistKey(currentUser, m.id), JSON.stringify(cur));
+      updateProgress();
+    });
+  });
+  updateProgress();
+}
+
+/* add checklist item and mark as custom */
+function addChecklistItem(label, openSave){
+  const savedObj = JSON.parse(localStorage.getItem(checklistKey(currentUser, currentMountain.id)) || 'null');
+  let items = [];
+  if(savedObj && Array.isArray(savedObj.items)) items = savedObj.items;
+  else items = currentMountain.recommended.map(l=>({label:l, checked:false, custom:false}));
+  items.push({label, checked:false, custom:true});
+  localStorage.setItem(checklistKey(currentUser, currentMountain.id), JSON.stringify({items}));
+  renderChecklist(currentMountain);
+  if(openSave) updateProgress();
+}
+
+/* save checklist */
+function saveChecklist(){
+  const itemsArr = [];
+  const inputs = checklistBox.querySelectorAll('.form-check');
+  inputs.forEach((div, idx)=>{
+    const checkbox = div.querySelector('input');
+    const label = div.querySelector('label').innerText;
+    itemsArr.push({label: label, checked: checkbox.checked, custom: label.includes('(custom)')});
+  });
+  localStorage.setItem(checklistKey(currentUser, currentMountain.id), JSON.stringify({items: itemsArr}));
+  updateProgress();
+}
+
+/* load plan helper */
+function loadPlan(u, mid){
+  const raw = localStorage.getItem(planKey(u, mid));
+  return raw ? JSON.parse(raw) : null;
+}
+
+/* update progress text */
+function updateProgress(){
+  const inputs = checklistBox.querySelectorAll('input[type="checkbox"]');
+  const total = inputs.length;
+  const checked = Array.from(inputs).filter(i=>i.checked).length;
+  progressText.textContent = `${checked} / ${total}`;
+}
+
+/* ============ MAP for planning (Leaflet) ============ */
+function initMapPlan(){
+  mapPlan = L.map('mapPlan', {zoomControl:true}).setView([MOUNTAINS[0].coords[0], MOUNTAINS[0].coords[1]], 7);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(mapPlan);
+}
+
+/* ============ CONGRATS modal like message ============ */
+function showCongrats(mname){
+  // small inline toast style
+  const toast = document.createElement('div');
+  toast.className = 'position-fixed top-0 start-50 translate-middle-x mt-4 p-3 rounded shadow-lg completed';
+  toast.style.zIndex = 9999;
+  toast.innerHTML = `<strong>Selamat!</strong><div>Persiapan untuk ${mname} sudah lengkap. Semoga pendakian aman & sehat.</div>`;
+  document.body.appendChild(toast);
+  setTimeout(()=> { toast.remove(); }, 4500);
+}
+
+/* ======== init when login persisted ======= */
+window.addEventListener('load', ()=> {
+  // check if previous user in localStorage (demo "remember")
+  const savedRemember = localStorage.getItem('camping_current_user');
+  if(savedRemember){
+    inputName.value = savedRemember;
+    login(savedRemember);
+  }
+});
+
+/* store current user for convenience */
+function rememberUser(u){
+  localStorage.setItem('camping_current_user', u);
+}
+
+/* enhance login to remember */
+function login(name){
+  currentUser = name;
+  if(!localStorage.getItem(userKey(name))){
+    localStorage.setItem(userKey(name), JSON.stringify({createdAt:Date.now()}));
+  }
+  rememberUser(name);
+  // show app
+  loginSection.classList.add('d-none');
+  appDiv.classList.remove('d-none');
+  welcomeUser.textContent = `Halo, ${currentUser}`;
+  currentUserEmail.textContent = `Akun: ${currentUser}`;
+  renderMountainGrid();
+}
+
+/* small improvements: when opening detail from grid, ensure plan hidden */
+document.getElementById('btnStartPlan').addEventListener('click', ()=>{
+  // handled earlier
+});
+
+/* On page unload, nothing special (data in localStorage) */
+</script>
 </body>
 </html>
