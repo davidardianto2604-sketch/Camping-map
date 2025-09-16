@@ -1,157 +1,323 @@
-<!DOCTYPE html><html lang="id">
+<!DOCTYPE html>
+<html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Gunung di Pulau Jawa</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Camping Map — Jawa Tengah (Lite)</title>
+
+  <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
   <style>
-    body { font-family: Arial, sans-serif; background: #f8f9fa; }
-    .mountain-card img { height: 200px; object-fit: cover; }
-    #map { height: 600px; margin-top: 20px; border-radius: 10px; }
+    body { background:#f6f8fb; font-family:system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
+    header { background:#0b5ed7; color:white; padding:1.2rem 0; text-align:center; margin-bottom:1rem; }
+    .card-img-top { height:160px; object-fit:cover; }
+    #map { height:450px; border-radius:8px; }
+    .checklist { background:white; padding:1rem; border-radius:8px; box-shadow:0 6px 18px rgba(16,24,40,0.06); }
+    .mt-small{ margin-top:.75rem; }
+    footer{ text-align:center; padding:1rem 0; color:#64748b; margin-top:2rem; }
+    @media (max-width:576px){ .card-img-top{height:120px;} #map{height:320px;} }
   </style>
 </head>
 <body>
-  <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="#">Gunung Jawa</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
-          <li class="nav-item"><a class="nav-link" href="#checklist">Checklist</a></li>
-          <li class="nav-item"><a class="nav-link" href="#map">Peta</a></li>
-        </ul>
-      </div>
-    </div>
-  </nav>  <!-- Home Section -->  <div class="container" id="home">
-    <h2 class="mb-4">Daftar Gunung di Pulau Jawa</h2>
-    <div class="row" id="mountain-list">
-      <!-- Card Gunung -->
-    </div>
-  </div>  <!-- Checklist -->  <div class="container my-5" id="checklist">
-    <h2>Checklist Perlengkapan Mendaki</h2>
-    <ul class="list-group">
-      <li class="list-group-item">Tenda & Sleeping Bag</li>
-      <li class="list-group-item">Carrier & Jas Hujan</li>
-      <li class="list-group-item">Sepatu Gunung</li>
-      <li class="list-group-item">Pakaian Hangat</li>
-      <li class="list-group-item">Headlamp & Powerbank</li>
-      <li class="list-group-item">Peralatan Masak</li>
-      <li class="list-group-item">Obat & P3K</li>
-      <li class="list-group-item">Logistik Makanan & Air</li>
-    </ul>
-  </div>  <!-- Map -->  <div class="container">
-    <h2>Peta Gunung di Pulau Jawa</h2>
-    <div id="map"></div>
-  </div>  <!-- Modal Detail -->  <div class="modal fade" id="mountainModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="mountainTitle"></h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <img id="mountainImg" class="img-fluid rounded mb-3" alt="">
-          <p><strong>Tinggi:</strong> <span id="mountainHeight"></span></p>
-          <p><strong>Lokasi:</strong> <span id="mountainLocation"></span></p>
-          <p><strong>Jalur Pendakian:</strong> <span id="mountainRoutes"></span></p>
-          <p><strong>Koordinat:</strong> <span id="mountainCoords"></span></p>
-        </div>
-      </div>
-    </div>
-  </div>  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>  <script>
-    const mountains = [
-      {
-        name: "Gunung Slamet",
-        height: "3.428 mdpl",
-        location: "Banyumas, Purbalingga, Pemalang, Tegal",
-        routes: "Bambangan, Baturaden, Guci, Permadi",
-        coords: [-7.242, 109.208],
-        img: "https://upload.wikimedia.org/wikipedia/commons/3/3a/Mount_Slamet_2009.jpg"
-      },
-      {
-        name: "Gunung Merbabu",
-        height: "3.145 mdpl",
-        location: "Magelang, Boyolali, Semarang",
-        routes: "Selo, Wekas, Cunthel, Suwanting",
-        coords: [-7.455, 110.438],
-        img: "https://upload.wikimedia.org/wikipedia/commons/d/d1/Merbabu_view_from_merapi.jpg"
-      },
-      {
-        name: "Gunung Merapi",
-        height: "2.930 mdpl",
-        location: "Sleman, Klaten, Magelang, Boyolali",
-        routes: "Selo, Babadan, Kaliurang",
-        coords: [-7.540, 110.446],
-        img: "https://upload.wikimedia.org/wikipedia/commons/1/1d/Merapi_in_Java.jpg"
-      },
-      {
-        name: "Gunung Semeru",
-        height: "3.676 mdpl",
-        location: "Lumajang, Malang",
-        routes: "Ranu Pani",
-        coords: [-8.108, 112.922],
-        img: "https://upload.wikimedia.org/wikipedia/commons/9/99/Mount_Semeru.jpg"
-      },
-      {
-        name: "Gunung Sindoro",
-        height: "3.153 mdpl",
-        location: "Temanggung, Wonosobo",
-        routes: "Kledung, Alang-alang Sewu",
-        coords: [-7.300, 109.992],
-        img: "https://upload.wikimedia.org/wikipedia/commons/a/a3/Mount_Sindoro.jpg"
-      },
-      {
-        name: "Gunung Sumbing",
-        height: "3.371 mdpl",
-        location: "Magelang, Temanggung, Wonosobo",
-        routes: "Cepit Parakan, Garung",
-        coords: [-7.384, 110.070],
-        img: "https://upload.wikimedia.org/wikipedia/commons/f/f9/Mount_Sumbing.jpg"
-      }
-      // 👉 Bisa ditambah lagi sampai semua gunung Jawa lengkap
-    ];
 
-    // Render Card Gunung
-    const listEl = document.getElementById('mountain-list');
-    mountains.forEach((m, i) => {
-      listEl.innerHTML += `
-        <div class="col-md-4 mb-4">
-          <div class="card mountain-card h-100 shadow-sm">
-            <img src="${m.img}" class="card-img-top" alt="${m.name}">
-            <div class="card-body">
-              <h5 class="card-title">${m.name}</h5>
-              <p class="card-text">${m.height} - ${m.location}</p>
-              <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#mountainModal" onclick="showDetail(${i})">Detail</button>
-            </div>
+<header>
+  <div class="container">
+    <h1 class="h3 mb-0">Camping Map — Fokus: Jawa Tengah</h1>
+    <small>Data gunung lengkap (ringkasan), peta, dan checklist persiapan</small>
+  </div>
+</header>
+
+<main class="container">
+  <!-- Grid gunung -->
+  <section>
+    <h2 class="h5 mb-3">Gunung Pilihan Jawa Tengah</h2>
+    <div class="row g-3" id="mountain-grid">
+      <!-- akan diisi via JS -->
+    </div>
+  </section>
+
+  <!-- Checklist + Controls -->
+  <section class="row mt-4">
+    <div class="col-lg-6">
+      <div class="checklist">
+        <h3 class="h6 mb-2">Checklist Perlengkapan (tersimpan otomatis)</h3>
+        <div id="checklist-items" class="mb-2">
+          <!-- checkbox items di-generate via JS -->
+        </div>
+        <div class="d-flex gap-2">
+          <button id="resetBtn" class="btn btn-outline-danger btn-sm">Reset Checklist</button>
+          <div class="ms-auto align-self-center">
+            <small id="progressText">0 / 0 items</small>
           </div>
-        </div>`;
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6 mt-small">
+      <div>
+        <h3 class="h6">Peta — klik marker untuk detail</h3>
+        <div id="map"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Placeholder Ulasan sederhana -->
+  <section class="mt-4">
+    <h3 class="h6">Ulasan Singkat (example)</h3>
+    <p class="text-muted">Fitur ulasan akan dikembangkan di versi berikutnya (backend).</p>
+  </section>
+</main>
+
+<footer>
+  <small>© 2025 Camping Map • Jawa Tengah (lite). Update data & fitur menyusul.</small>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+/* ===== DATA GUNUNG (Jawa Tengah) - lengkap ringkasan =====
+   Field: id, name, height, location, difficulty, time, routes, coords [lat,lng], img
+   Foto: publik (Wikimedia/Unsplash). Thumbnail size digunakan via direct link.
+*/
+const mountains = [
+  {
+    id:"slamet",
+    name:"Gunung Slamet",
+    height:"3.428 mdpl",
+    location:"Banyumas, Purbalingga, Pemalang, Tegal, Brebes",
+    difficulty:"Sulit",
+    time:"8–12 jam (one way tergantung jalur)",
+    routes:"Bambangan (Purbalingga), Kaliwadas (Banyumas), Permadi/Guci (Tegal), Dipajaya (Pemalang)",
+    coords:[-7.242, 109.208],
+    img:"https://upload.wikimedia.org/wikipedia/commons/2/2f/Gunung_Slamet_dari_Purwokerto.jpg"
+  },
+  {
+    id:"sindoro",
+    name:"Gunung Sindoro",
+    height:"3.153 mdpl",
+    location:"Temanggung - Wonosobo",
+    difficulty:"Menengah",
+    time:"6–8 jam",
+    routes:"Kledung, Sigedang, Alang-alang Sewu",
+    coords:[-7.300, 109.992],
+    img:"https://upload.wikimedia.org/wikipedia/commons/a/a3/Mount_Sindoro.jpg"
+  },
+  {
+    id:"sumbing",
+    name:"Gunung Sumbing",
+    height:"3.371 mdpl",
+    location:"Magelang, Wonosobo, Temanggung",
+    difficulty:"Menengah",
+    time:"6–9 jam",
+    routes:"Garung, Cepit Parakan",
+    coords:[-7.384, 110.070],
+    img:"https://upload.wikimedia.org/wikipedia/commons/f/f9/Mount_Sumbing.jpg"
+  },
+  {
+    id:"merbabu",
+    name:"Gunung Merbabu",
+    height:"3.145 mdpl",
+    location:"Magelang, Boyolali",
+    difficulty:"Menengah",
+    time:"6–10 jam",
+    routes:"Selo, Wekas, Cunthel, Suwanting",
+    coords:[-7.455, 110.438],
+    img:"https://upload.wikimedia.org/wikipedia/commons/d/d1/Merbabu_view_from_merapi.jpg"
+  },
+  {
+    id:"merapi",
+    name:"Gunung Merapi",
+    height:"2.930 mdpl",
+    location:"Sleman, Klaten, Magelang, Boyolali",
+    difficulty:"Sulit (aktif)",
+    time:"6–8 jam (tergantung jalur)",
+    routes:"Selo, Babadan, Babadan Kaliurang",
+    coords:[-7.540, 110.446],
+    img:"https://upload.wikimedia.org/wikipedia/commons/1/1d/Merapi_in_Java.jpg"
+  },
+  {
+    id:"lawu",
+    name:"Gunung Lawu",
+    height:"3.265 mdpl",
+    location:"Karanganyar, Magetan",
+    difficulty:"Menengah",
+    time:"5–7 jam",
+    routes:"Cemoro Sewu, Cemoro Kandang, Candi Cetho",
+    coords:[-7.63, 111.19],
+    img:"https://upload.wikimedia.org/wikipedia/commons/8/8d/Gunung_Lawu.jpg"
+  },
+  {
+    id:"prau",
+    name:"Gunung Prau",
+    height:"2.565 mdpl",
+    location:"Dieng Plateau (Wonosobo)",
+    difficulty:"Mudah – Menengah",
+    time:"3–5 jam",
+    routes:"Patak Banteng (Dieng), Dieng Wetan",
+    coords:[-7.192, 109.921],
+    img:"https://upload.wikimedia.org/wikipedia/commons/0/0f/Gunung_Prau.jpg"
+  },
+  {
+    id:"ungaran",
+    name:"Gunung Ungaran",
+    height:"2.050 mdpl",
+    location:"Semarang, Salatiga (Jawa Tengah)",
+    difficulty:"Mudah",
+    time:"3–5 jam",
+    routes:"Ungaran, Bandungan",
+    coords:[-7.127, 110.398],
+    img:"https://upload.wikimedia.org/wikipedia/commons/e/e9/Mount_Ungaran_view.jpg"
+  },
+  {
+    id:"telomoyo",
+    name:"Gunung Telomoyo",
+    height:"1.894 mdpl",
+    location:"Magelang (Kabupaten Semarang sekitar)",
+    difficulty:"Mudah",
+    time:"2–4 jam",
+    routes:"Tegalsari, Pandansari",
+    coords:[-7.255, 110.486],
+    img:"https://upload.wikimedia.org/wikipedia/commons/7/77/Telomoyo.jpg"
+  },
+  {
+    id:"muria",
+    name:"Gunung Muria",
+    height:"1.602 mdpl",
+    location:"Jepara, Kudus, Pati (Jawa Tengah)",
+    difficulty:"Mudah",
+    time:"3–5 jam",
+    routes:"Kudus, Jepara",
+    coords:[-6.789, 110.767],
+    img:"https://upload.wikimedia.org/wikipedia/commons/6/66/Gn_Muria.jpg"
+  }
+];
+
+/* ====== RENDER GRID ====== */
+const grid = document.getElementById('mountain-grid');
+mountains.forEach((m, idx) => {
+  const col = document.createElement('div');
+  col.className = 'col-md-4';
+  col.innerHTML = `
+    <div class="card mountain-card h-100 shadow-sm">
+      <img src="${m.img}" class="card-img-top" alt="${m.name}">
+      <div class="card-body d-flex flex-column">
+        <h5 class="card-title">${m.name}</h5>
+        <p class="mb-2 small text-muted">${m.height} • ${m.location}</p>
+        <div class="mt-auto d-flex gap-2">
+          <button class="btn btn-sm btn-outline-primary" onclick="panTo(${m.coords[0]}, ${m.coords[1]})">Lihat di Peta</button>
+          <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modal-${m.id}">Detail</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal ${m.id} -->
+    <div class="modal fade" id="modal-${m.id}" tabindex="-1">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">${m.name}</h5>
+            <button class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <img src="${m.img}" alt="${m.name}" class="img-fluid rounded mb-3" />
+            <p><strong>Ketinggian:</strong> ${m.height}</p>
+            <p><strong>Lokasi administratif:</strong> ${m.location}</p>
+            <p><strong>Jalur pendakian populer:</strong> ${m.routes}</p>
+            <p><strong>Perkiraan waktu pendakian:</strong> ${m.time}</p>
+            <p><strong>Koordinat:</strong> ${m.coords[0]}, ${m.coords[1]}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  grid.appendChild(col);
+});
+
+/* ====== CHECKLIST SAVE (localStorage) ====== */
+const checklistItems = [
+  {id:'carrier', label:'Tas Carrier'},
+  {id:'tenda', label:'Tenda'},
+  {id:'matras', label:'Matras/Mat'},
+  {id:'sleeping', label:'Sleeping Bag'},
+  {id:'headlamp', label:'Senter / Headlamp'},
+  {id:'jacket', label:'Jaket Gunung'},
+  {id:'rain', label:'Jas Hujan'},
+  {id:'shoes', label:'Sepatu Gunung'},
+  {id:'cook', label:'Peralatan Masak'},
+  {id:'food', label:'Makanan & Minuman'},
+  {id:'p3k', label:'Kotak P3K'}
+];
+
+const checklistContainer = document.getElementById('checklist-items');
+function renderChecklist(){
+  checklistContainer.innerHTML = '';
+  checklistItems.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'form-check';
+    const checked = localStorage.getItem('chk_'+item.id) === '1';
+    div.innerHTML = `
+      <input class="form-check-input" type="checkbox" id="${item.id}" ${checked ? 'checked' : ''}>
+      <label class="form-check-label" for="${item.id}">${item.label}</label>
+    `;
+    checklistContainer.appendChild(div);
+    div.querySelector('input').addEventListener('change', (e)=>{
+      localStorage.setItem('chk_'+item.id, e.target.checked ? '1' : '0');
+      updateProgress();
     });
+  });
+  updateProgress();
+}
+function resetChecklist(){
+  checklistItems.forEach(i => localStorage.removeItem('chk_'+i.id));
+  renderChecklist();
+}
+document.getElementById('resetBtn').addEventListener('click', ()=> {
+  if(confirm('Reset semua checklist?')) resetChecklist();
+});
+function updateProgress(){
+  const total = checklistItems.length;
+  let done = 0;
+  checklistItems.forEach(i => { if(localStorage.getItem('chk_'+i.id) === '1') done++; });
+  document.getElementById('progressText').textContent = `${done} / ${total} items`;
+}
+renderChecklist();
 
-    // Show Detail Modal
-    function showDetail(i) {
-      const m = mountains[i];
-      document.getElementById('mountainTitle').textContent = m.name;
-      document.getElementById('mountainImg').src = m.img;
-      document.getElementById('mountainHeight').textContent = m.height;
-      document.getElementById('mountainLocation').textContent = m.location;
-      document.getElementById('mountainRoutes').textContent = m.routes;
-      document.getElementById('mountainCoords').textContent = m.coords.join(", ");
-    }
+/* ====== LEAFLET MAP ====== */
+const map = L.map('map', {zoomControl:true}).setView([-7.3, 110.0], 7);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+  maxZoom:18, attribution:'© OpenStreetMap contributors'
+}).addTo(map);
 
-    // Peta Leaflet
-    const map = L.map('map').setView([-7.5, 110], 7);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap'
-    }).addTo(map);
+const markers = [];
+mountains.forEach(m=>{
+  const marker = L.marker(m.coords).addTo(map);
+  marker.bindPopup(`<b>${m.name}</b><br>${m.height}<br><img src="${m.img}" width="180" style="display:block;margin-top:6px;border-radius:6px;">`);
+  markers.push(marker);
+});
 
-    mountains.forEach(m => {
-      L.marker(m.coords).addTo(map)
-        .bindPopup(`<b>${m.name}</b><br>${m.height}<br><img src='${m.img}' width='200'>`);
-    });
-  </script></body>
+/* panTo function used by card button */
+function panTo(lat,lng){
+  map.setView([lat,lng], 11, {animate:true});
+  // open popup for the marker close to coords
+  const found = markers.find(marker=>{
+    const c = marker.getLatLng();
+    return Math.abs(c.lat - lat) < 0.001 && Math.abs(c.lng - lng) < 0.001;
+  });
+  if(found) found.openPopup();
+}
+
+/* responsive: if modal opens, map may need invalidateSize later */
+const bsModal = document.querySelectorAll('.modal');
+bsModal.forEach(mo=>{
+  mo.addEventListener('shown.bs.modal', ()=>{ setTimeout(()=>map.invalidateSize(),300); });
+});
+</script>
+</body>
 </html>
