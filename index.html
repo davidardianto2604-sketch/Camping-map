@@ -3,65 +3,140 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Camping Map</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <title>Checklist Perlengkapan Camping</title>
   <style>
     body {
-      margin: 0;
       font-family: Arial, sans-serif;
+      background: #f9fafb;
+      margin: 0;
+      padding: 20px;
     }
-    #map {
-      height: 60vh;
-    }
-    h1, h2 {
+    h1 {
       text-align: center;
+      color: #2c3e50;
     }
-    .checklist {
+    .progress-container {
+      width: 100%;
+      background: #e0e0e0;
+      border-radius: 20px;
+      margin: 20px 0;
+      height: 25px;
+    }
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #4caf50, #81c784);
+      border-radius: 20px;
+      text-align: center;
+      color: white;
+      font-size: 14px;
+      line-height: 25px;
+    }
+    .category {
+      background: white;
       padding: 15px;
-      max-width: 600px;
-      margin: 20px auto;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      background: #f9f9f9;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
-    .checklist label {
+    .category h2 {
+      font-size: 18px;
+      margin-bottom: 10px;
+      color: #34495e;
+    }
+    label {
       display: block;
-      padding: 5px 0;
+      margin: 6px 0;
+      cursor: pointer;
+    }
+    input[type="checkbox"] {
+      margin-right: 10px;
+    }
+    button {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
       font-size: 16px;
+      background: #e74c3c;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #c0392b;
     }
   </style>
 </head>
 <body>
-  <h1>Camping Map</h1>
-  <div id="map"></div>
+  <h1>Checklist Camping</h1>
 
-  <h2>Checklist Perlengkapan Pendakian</h2>
-  <div class="checklist">
+  <!-- Progress Bar -->
+  <div class="progress-container">
+    <div class="progress-bar" id="progressBar">0%</div>
+  </div>
+
+  <!-- Kategori: Peralatan Utama -->
+  <div class="category">
+    <h2>Peralatan Utama</h2>
     <label><input type="checkbox"> Tas Carrier</label>
     <label><input type="checkbox"> Tenda</label>
-    <label><input type="checkbox"> Jaket</label>
     <label><input type="checkbox"> Matras</label>
-    <label><input type="checkbox"> Jas Hujan</label>
-    <label><input type="checkbox"> Makanan</label>
     <label><input type="checkbox"> Sleeping Bag</label>
-    <label><input type="checkbox"> Senter / Headlamp</label>
+  </div>
+
+  <!-- Kategori: Pakaian -->
+  <div class="category">
+    <h2>Pakaian</h2>
+    <label><input type="checkbox"> Jaket</label>
+    <label><input type="checkbox"> Jas Hujan</label>
     <label><input type="checkbox"> Sepatu</label>
     <label><input type="checkbox"> Pakaian Ganti</label>
-    <label><input type="checkbox"> Peralatan Masak</label>
+  </div>
+
+  <!-- Kategori: Penerangan -->
+  <div class="category">
+    <h2>Penerangan</h2>
+    <label><input type="checkbox"> Senter</label>
+    <label><input type="checkbox"> Headlamp</label>
+  </div>
+
+  <!-- Kategori: Peralatan Masak -->
+  <div class="category">
+    <h2>Peralatan Masak</h2>
+    <label><input type="checkbox"> Kompor</label>
+    <label><input type="checkbox"> Peralatan Masak (panci, wajan, sendok, dll)</label>
+    <label><input type="checkbox"> Makanan & Minuman</label>
+  </div>
+
+  <!-- Kategori: Lain-lain -->
+  <div class="category">
+    <h2>Lain-lain</h2>
     <label><input type="checkbox"> P3K</label>
   </div>
 
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <button onclick="resetChecklist()">Reset Checklist</button>
+
   <script>
-    var map = L.map('map').setView([-7.2, 110.3], 9);
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    const progressBar = document.getElementById("progressBar");
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-    }).addTo(map);
+    checkboxes.forEach(cb => {
+      cb.addEventListener("change", updateProgress);
+    });
 
-    // Contoh marker
-    L.marker([-7.195, 110.116]).addTo(map).bindPopup('Gunung Prau');
-    L.marker([-7.267, 110.219]).addTo(map).bindPopup('Bukit Sikendil');
+    function updateProgress() {
+      const total = checkboxes.length;
+      const checked = document.querySelectorAll('input[type="checkbox"]:checked').length;
+      const percent = Math.round((checked / total) * 100);
+      progressBar.style.width = percent + "%";
+      progressBar.textContent = percent + "%";
+    }
+
+    function resetChecklist() {
+      checkboxes.forEach(cb => cb.checked = false);
+      updateProgress();
+    }
   </script>
 </body>
 </html>
