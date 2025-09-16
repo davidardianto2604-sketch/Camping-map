@@ -4,19 +4,64 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Camping Map</title>
-  <link rel="stylesheet" href="style.css">
-
-  <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+    #map {
+      height: 60vh;
+    }
+    h1, h2 {
+      text-align: center;
+    }
+    .checklist {
+      padding: 15px;
+      max-width: 600px;
+      margin: 20px auto;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: #f9f9f9;
+    }
+    .checklist label {
+      display: block;
+      padding: 5px 0;
+      font-size: 16px;
+    }
+  </style>
 </head>
 <body>
   <h1>Camping Map</h1>
   <div id="map"></div>
 
-  <!-- Leaflet JS -->
+  <h2>Checklist Perlengkapan Pendakian</h2>
+  <div class="checklist">
+    <label><input type="checkbox"> Tas Carrier</label>
+    <label><input type="checkbox"> Tenda</label>
+    <label><input type="checkbox"> Jaket</label>
+    <label><input type="checkbox"> Matras</label>
+    <label><input type="checkbox"> Jas Hujan</label>
+    <label><input type="checkbox"> Makanan</label>
+    <label><input type="checkbox"> Sleeping Bag</label>
+    <label><input type="checkbox"> Senter / Headlamp</label>
+    <label><input type="checkbox"> Sepatu</label>
+    <label><input type="checkbox"> Pakaian Ganti</label>
+    <label><input type="checkbox"> Peralatan Masak</label>
+    <label><input type="checkbox"> P3K</label>
+  </div>
+
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <!-- PapaParse untuk baca CSV -->
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-  <script src="script.js"></script>
+  <script>
+    var map = L.map('map').setView([-7.2, 110.3], 9);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+    }).addTo(map);
+
+    // Contoh marker
+    L.marker([-7.195, 110.116]).addTo(map).bindPopup('Gunung Prau');
+    L.marker([-7.267, 110.219]).addTo(map).bindPopup('Bukit Sikendil');
+  </script>
 </body>
 </html>
